@@ -1,25 +1,20 @@
-from llama_index.core import (
-    SimpleDirectoryReader,
-    StorageContext,
-    Settings,
-    load_index_from_storage,
-    VectorStoreIndex,
-    ServiceContext
-)
-from llama_index.core.query_engine import RetrieverQueryEngine
-from llama_index.retrievers.bm25 import BM25Retriever
-from llama_index.core.retrievers import VectorIndexRetriever, BaseRetriever
-from llama_index.postprocessor.cohere_rerank import CohereRerank
-from llama_index.core.node_parser import SentenceSplitter
-from dotenv import load_dotenv
-from llama_index.core.postprocessor import SimilarityPostprocessor
-from llama_index.llms.openai import OpenAI
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_parse import LlamaParse
-import os
-
 import logging
+import os
 import sys
+
+from dotenv import load_dotenv
+from llama_index.core import (ServiceContext, Settings, SimpleDirectoryReader,
+                              StorageContext, VectorStoreIndex,
+                              load_index_from_storage)
+from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core.postprocessor import SimilarityPostprocessor
+from llama_index.core.query_engine import RetrieverQueryEngine
+from llama_index.core.retrievers import BaseRetriever, VectorIndexRetriever
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.openai import OpenAI
+from llama_index.postprocessor.cohere_rerank import CohereRerank
+from llama_index.retrievers.bm25 import BM25Retriever
+from llama_parse import LlamaParse
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger().handlers = []
@@ -36,6 +31,7 @@ cohere_api_key = os.environ["COHERE_API_KEY"]
 
 # create global settings for llm model and embedding model
 Settings.llm = OpenAI(model="gpt-4-1106-preview")
+llm = Settings.llm
 Settings.embed_model = OpenAIEmbedding(model="text-embedding-ada-002")
 
 # initialized a global local storage path

@@ -1,9 +1,11 @@
-import requests
-from utils.distance_calc import calculate_distance
-from utils.google_location import get_latitude_longitude, get_distance_and_route_info
-from dotenv import load_dotenv
 import os
+
+import requests
+from dotenv import load_dotenv
+
 from utils.charge_station_availability import is_charge_station_available
+from utils.google_location import (get_distance_and_route_info,
+                                   get_latitude_longitude)
 
 # Load environment variables
 load_dotenv()

@@ -1,12 +1,13 @@
-from llama_index.core.tools import QueryEngineTool, ToolMetadata, FunctionTool
 from llama_index.agent.openai import OpenAIAgent
 from llama_index.core.agent import ReActAgent
 from llama_index.core.query_engine import SubQuestionQueryEngine
-from advance_rag import query_engine
-from charge_station_locator import charge_points_locator
-from prompt import context
+from llama_index.core.tools import FunctionTool, QueryEngineTool, ToolMetadata
 from pydantic import BaseModel
+
+from advance_rag import llm, query_engine
+from charge_station_locator import charge_points_locator
 from ev_trip_planner import ev_trip_planner
+from prompt import context
 
 
 class ChargePointsLocator(BaseModel):
@@ -64,6 +65,7 @@ query_engine_tools = [
 # create a sub question query engine
 sub_question_query_engine = SubQuestionQueryEngine.from_defaults(
     query_engine_tools=query_engine_tools,
+    llm=llm,
 )
 
 # create query engine tool for sub question query engine
@@ -88,5 +90,6 @@ agent = ReActAgent.from_tools(
     tools=tools,
     verbose=True,
     context=context,
+    llm=llm,
 )
     

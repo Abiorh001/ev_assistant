@@ -1,6 +1,7 @@
-from utils.google_location import get_latitude_longitude, get_distance_and_route_info
 from charge_station_locator import get_closest_charge_stations
 from utils.charge_station_availability import is_charge_station_available
+from utils.google_location import (get_distance_and_route_info,
+                                   get_latitude_longitude)
 
 
 def segment_trip(user_address, user_destination_address):
