@@ -16,9 +16,9 @@ from llama_index.postprocessor.cohere_rerank import CohereRerank
 from llama_index.retrievers.bm25 import BM25Retriever
 from llama_parse import LlamaParse
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-logging.getLogger().handlers = []
-logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
+# logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+# logging.getLogger().handlers = []
+# logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 # Load environment variables
 load_dotenv()
@@ -30,7 +30,7 @@ cohere_api_key = os.environ["COHERE_API_KEY"]
 
 
 # create global settings for llm model and embedding model
-Settings.llm = OpenAI(model="gpt-4-1106-preview")
+Settings.llm = OpenAI(model="gpt-4-1106-preview", max_tokens=2000)
 llm = Settings.llm
 Settings.embed_model = OpenAIEmbedding(model="text-embedding-ada-002")
 

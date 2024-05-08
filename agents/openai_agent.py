@@ -85,6 +85,7 @@ tools = [
     ev_trip_planner_tool,
 ]
 
+
 # create agent
 agent = ReActAgent.from_tools(
     tools=tools,
@@ -92,4 +93,4 @@ agent = ReActAgent.from_tools(
     context=context,
     llm=llm,
 )
-    
+

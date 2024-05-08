@@ -20,7 +20,7 @@ if opencharge_map_api_key is None:
 charge_stations = []
 
 
-def get_closest_charge_stations(user_latitude, user_longitude, max_results=2, max_distance=None):
+def get_closest_charge_stations(user_latitude, user_longitude, max_results=10, max_distance=None):
     """
     Get the closest charging stations to the user's location using OpenChargeMap API.
     """
