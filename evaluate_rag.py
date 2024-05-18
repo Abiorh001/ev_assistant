@@ -8,7 +8,7 @@ from llama_index.core.evaluation import (BatchEvalRunner,
                                          RetrieverEvaluator,
                                          generate_question_context_pairs)
 
-from advance_rag import (OpenAI, ServiceContext, VectorStoreIndex,
+from query_engines.ocpp_query_engine import (OpenAI, ServiceContext, VectorStoreIndex,
                          hybrid_retriever, llm, nodes, query_engine)
 
 # create question context pairs
