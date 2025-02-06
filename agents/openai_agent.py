@@ -3,11 +3,11 @@ import os
 import sys
 
 from dotenv import load_dotenv
-from llama_index.agent.openai import OpenAIAgent
 from llama_index.core.agent import ReActAgent
+from llama_index.llms.openai import OpenAI
 from llama_index.core.query_engine import SubQuestionQueryEngine
 from llama_index.core.tools import FunctionTool, QueryEngineTool, ToolMetadata
-from llama_index.llms.openai import OpenAI
+
 
 from agents.agent_tools.charge_station_locator import \
     charge_station_locator_tool
@@ -57,7 +57,7 @@ ev_trip_planner_tool = FunctionTool.from_defaults(
     ),
 )
 # create query engine tool for the ocpp query engine
-ocpp_query_engine_tool = QueryEngineTool(
+ocpp_query_engine_tool = QueryEngineTool.from_defaults(
     query_engine=ocpp_query_engine,
     metadata=ToolMetadata(
         name="ocpp_query_engine",
@@ -66,13 +66,7 @@ ocpp_query_engine_tool = QueryEngineTool(
 )
 # create query engine tool to be use in the sub question ocpp query engine
 ocpp_query_engine_tools = [
-    QueryEngineTool(
-        query_engine=ocpp_query_engine,
-        metadata=ToolMetadata(
-            name="ocpp_query_engine",
-            description="This tool is used to answer questions related to Open Charge Point Protocol (OCPP) and electric vehicle charging stations., how to connect to the charging stations and the electric vechicle supply equipments. through the OCPP protocol.",
-        ),
-    )
+    ocpp_query_engine_tool
 ]
 # create a sub question query engine
 ocpp_sub_question_query_engine = SubQuestionQueryEngine.from_defaults(
@@ -81,7 +75,7 @@ ocpp_sub_question_query_engine = SubQuestionQueryEngine.from_defaults(
 )
 
 # create query engine tool for sub question ocpp query engine
-ocpp_sub_question_query_engine_tool = QueryEngineTool(
+ocpp_sub_question_query_engine_tool = QueryEngineTool.from_defaults(
     query_engine=ocpp_sub_question_query_engine,
     metadata=ToolMetadata(
         name="ocpp_sub_question_query_engine",
@@ -105,3 +99,6 @@ agent = ReActAgent.from_tools(
     context=context,
     llm=llm,
 )
+
+response = agent.chat("Tell me what you can do and what you are")
+print(response)

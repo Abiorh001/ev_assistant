@@ -1,316 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EV Companion</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <style>
-    body {
-      font-family: 'Montserrat', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(45deg, #121212, #333);
-      color: #fff;
-    }
-
-    #container {
-      width: 800px;
-      max-width: 90%;
-      background-color: #1c1c1c;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-      padding: 20px;
-      position: relative;
-    }
-
-    #conversation {
-      height: 500px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid #333;
-      border-radius: 5px;
-      background-color: #252525;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .message, .response {
-      padding: 10px 40px;
-      border-radius: 20px;
-      margin: 5px;
-      max-width: 70%;
-      word-wrap: break-word;
-      line-height: 1.5;
-      position: relative;
-    }
-
-    .message {
-      background-color: #ffa500;
-      color: #000;
-      align-self: flex-end;
-    }
-
-    .response {
-      background-color: #333;
-      color: #fff;
-      align-self: flex-start;
-    }
-
-    .message::before {
-      content: '\f007';
-      font-family: 'Font Awesome 5 Free';
-      font-weight: 900;
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #000;
-    }
-
-    .response::before {
-        content: '';
-        background-image: url('data:image/png;base64,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'); /* Path to your image */
-        background-size: contain;
-        background-repeat: no-repeat;
-        width: 20px; /* Adjust width and height as needed */
-        height: 20px;
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-      }
-      
-
-    #input-container {
-      display: flex;
-      margin-top: 10px;
-    }
-
-    #message-input {
-      flex-grow: 1;
-      padding: 10px;
-      border: 1px solid #333;
-      border-radius: 5px;
-      background-color: #1c1c1c;
-      color: #fff;
-      font-family: inherit;
-      font-size: 16px;
-    }
-
-    #send-button {
-      padding: 10px 20px;
-      background: linear-gradient(45deg, #ffa500, #ff6600);
-      color: #000;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-      margin-left: 10px;
-      font-family: inherit;
-      font-size: 16px;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    #send-button:hover {
-      background: linear-gradient(45deg, #ff9000, #ff6600);
-    }
-
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid #1c1c1c;
-      border-top: 3px solid #ffa500;
-      border-radius: 50%;
-      animation: spin 2s linear infinite;
-    }
-    #suggestions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 20px;
-      }
-  
-      .suggestion-btn {
-        background-color: #40414f;
-        color: #fff;
-        border: none;
-        padding: 10px 20px;
-        margin: 5px;
-        border-radius: 5px;
-        font-family: inherit;
-        font-size: 14px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-  
-      .suggestion-btn:hover {
-        background-color: #555;
-      }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Interface</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            text-align: center;
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .button {
+            background-color: #ffa500;
+            padding: 20px 40px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            width: 150px;
+        }
+        .button svg {
+            margin-bottom: 10px;
+        }
+        .button:hover {
+            background-color: #2a2a2a;
+        }
+        .message {
+            position: fixed;
+            bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: calc(100% - 40px);
+            padding: 0 20px;
+        }
+        .message textarea {
+            background-color: #1E1E1E;
+            border: none;
+            padding: 10px;
+            border-radius: 25px;
+            color: white;
+            flex: 1;
+            padding-left: 20px;
+            resize: none;
+            overflow: hidden;
+            min-height: 40px;
+        }
+        .message button {
+            background-color: #ffa500;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+        }
+        .message button.loading {
+            background-color: #ffa500;
+            cursor: not-allowed;
+        }
+        .message-bubble {
+            padding: 10px;
+            border-radius: 10px;
+            margin: 5px 0;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .sent {
+            background-color: #ffa500;
+            align-self: flex-end;
+        }
+        .received {
+            background-color: #2a2a2a;
+            align-self: flex-start;
+        }
+    </style>
 </head>
 <body>
-    <div id="container">
-        <div id="header">
-          <img src="https://img.icons8.com/color/48/000000/electric-car.png" alt="EV Icon">
-          <h1>EV Companion</h1>
+    <div class="container">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="80" height="80" fill="white">
+                <path d="M50 4C25.3 4 6 23.3 6 48s19.3 44 44 44 44-19.3 44-44S74.7 4 50 4zm0 82C29 86 12 69 12 48S29 10 50 10s38 17 38 38-17 38-38 38z"/>
+                <path d="M50 14c-19.9 0-36 16.1-36 36s16.1 36 36 36 36-16.1 36-36S69.9 14 50 14zm0 66c-16.6 0-30-13.4-30-30S33.4 20 50 20s30 13.4 30 30-13.4 30-30 30z"/>
+            </svg>
         </div>
-        <div id="conversation" aria-live="polite"></div>
-        <div id="suggestions">
-          <button class="suggestion-btn" onclick="sendSuggestion('EV Trip Planner Tool')">EV Trip Planner Tool</button>
-          <button class="suggestion-btn" onclick="sendSuggestion('Charge Car Anywhere')">Charge Car Anywhere</button>
-          <button class="suggestion-btn" onclick="sendSuggestion('EV Charging Point Details')">EV Charging Point Details</button>
-          <button class="suggestion-btn" onclick="sendSuggestion('Support for EV Charging')">Support for EV Charging</button>
-          <button class="suggestion-btn" onclick="sendSuggestion('EV Adoption Recommendations')">EV Adoption Recommendations</button>
+        <div class="buttons">
+            <div class="button" onclick="sendSuggestion('Plan a new Trip')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.46.04-.91.1-1.35l1.53 1.53c.09.09.22.15.35.15h3.04c.13 0 .26-.06.35-.15l2.29-2.29c.09-.09.15-.22.15-.35V8.5c0-.13-.06-.26-.15-.35l-1.94-1.94c.44-.05.89-.08 1.35-.08 4.08 0 7.44 3.05 7.93 7-.49 3.95-3.85 7-7.93 7zM8.29 6.29l2.3 2.29v2.04L7.36 6.38c.28-.04.57-.09.86-.09s.58.05.86.09l-.79.79zM4.5 7C3.67 7 3 6.33 3 5.5S3.67 4 4.5 4 6 4.67 6 5.5 5.33 7 4.5 7zM19.5 18c-.83 0-1.5-.67-1.5-1.5S18.67 15 19.5 15 21 15.67 21 16.5 20.33 18 19.5 18z"/></svg>
+                <span>Plan a new Trip</span>
+            </div>
+            <div class="button" onclick="sendSuggestion('Charge EV Anywhere')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 2c2.02 0 3.88.59 5.46 1.59L5.59 16.46C4.59 14.88 4 13.02 4 11c0-4.42 3.58-8 8-8zm0 16c-2.02 0-3.88-.59-5.46-1.59L18.41 7.54C19.41 9.12 20 10.98 20 13c0 4.42-3.58 8-8 8z"/></svg>
+                <span>Charge EV Anywhere</span>
+            </div>
+            <div class="button" onclick="sendSuggestion('Open Charge Point Protocol')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 2c2.02 0 3.88.59 5.46 1.59L5.59 16.46C4.59 14.88 4 13.02 4 11c0-4.42 3.58-8 8-8zm0 16c-2.02 0-3.88-.59-5.46-1.59L18.41 7.54C19.41 9.12 20 10.98 20 13c0 4.42-3.58 8-8 8z"/></svg>
+                <span>Open Charge Point Protocol</span>
+            </div>
         </div>
-        <div id="input-container">
-          <input type="text" id="message-input" placeholder="Type your message..." aria-label="Message input">
-          <button id="send-button" aria-label="Send message">
-            <span id="send-button-text">Send</span>
-            <div id="loading-indicator" class="loading" style="display: none;" aria-hidden="true"></div>
-          </button>
-        </div>
-      </div>
- <script>
-    function generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
+    </div>
+    <div id="chat-container" style="display: flex; flex-direction: column; width: 100%; padding: 20px; max-width: 600px;"></div>
+    <div class="message">
+        <textarea id="message-input" placeholder="Message ChatGPT"></textarea>
+        <button id="send-button">➤</button>
+    </div>
+    <script>
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        let clientId = generateUUID();
+        const webSocket = new WebSocket("ws://127.0.0.1:8765/ws/" + clientId);
+        const sendButton = document.getElementById("send-button");
+        const messageInput = document.getElementById("message-input");
+        const chatContainer = document.getElementById("chat-container");
+
+        webSocket.onclose = function(event) {
+            console.log("WebSocket connection closed.");
+        };
+
+        webSocket.onopen = function(event) {
+            console.log("WebSocket connection established.");
+        };
+
+        webSocket.onmessage = function(event) {
+            const responseDiv = document.createElement("div");
+            responseDiv.classList.add("message-bubble", "received");
+            responseDiv.innerHTML = formatResponse(event.data);
+            chatContainer.appendChild(responseDiv);
+            sendButton.classList.remove("loading");
+            sendButton.disabled = false;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        };
+
+        webSocket.onerror = function(event) {
+            console.error("WebSocket error:", event);
+        };
+
+        sendButton.addEventListener("click", function() {
+            sendMessage();
         });
-    }
-    let clientId = generateUUID()
-    const webSocket = new WebSocket("wss://ev-assistant.onrender.com/ws/"+ clientId);
-    const conversationDiv = document.getElementById("conversation");
-    const sendButton = document.getElementById("send-button");
-    const sendButtonText = document.getElementById("send-button-text");
-    const loadingIndicator = document.getElementById("loading-indicator");
 
-    // Function to handle WebSocket close event
-    webSocket.onclose = function(event) {
-      console.log("WebSocket connection closed.");
-    };
+        messageInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+            adjustTextareaHeight();
+        });
 
-    webSocket.onopen = function (event) {
-      console.log("WebSocket connection established.");
-    };
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message !== "") {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message-bubble", "sent");
+                messageDiv.textContent = message;
+                chatContainer.appendChild(messageDiv);
+                webSocket.send(message);
+                messageInput.value = "";
+                sendButton.classList.add("loading");
+                sendButton.disabled = true;
+                adjustTextareaHeight();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
 
-    webSocket.onmessage = function (event) {
-      const responseDiv = document.createElement("div");
-      responseDiv.classList.add("response");
+        function sendSuggestion(suggestion) {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message-bubble", "sent");
+            messageDiv.textContent = suggestion;
+            chatContainer.appendChild(messageDiv);
+            webSocket.send(suggestion);
+            sendButton.classList.add("loading");
+            sendButton.disabled = true;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-      const formattedResponse = formatResponse(event.data);
-      responseDiv.innerHTML = formattedResponse;
+        function adjustTextareaHeight() {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = (messageInput.scrollHeight) + 'px';
+        }
 
-      conversationDiv.appendChild(responseDiv);
-      conversationDiv.scrollTop = conversationDiv.scrollHeight;
-      sendButtonText.style.display = "inline";
-      loadingIndicator.style.display = "none";
-    };
+        function formatResponse(response) {
+            const patterns = {
+                headings: /^#+\s(.+)/,
+                bold: /\*\*(.*?)\*\*/g,
+                italic: /_(.*?)_/g,
+                strikethrough: /~~(.*?)~~/g,
+                links: /\[([^\]]+)\]\(([^)]+)\)/g,
+                unorderedList: /^\s*-\s(.+)/,
+                orderedList: /^\s*\d+\.\s(.+)/,
+                code: /`([^`]+)`/g,
+            };
 
-    webSocket.onerror = function (event) {
-      console.error("WebSocket error:", event);
-    };
+            function replaceMarkdown(text) {
+                text = text.replace(patterns.headings, '<h3 style="color: #ffa500;">$1</h3>');
+                text = text.replace(patterns.bold, '<strong>$1</strong>');
+                text = text.replace(patterns.italic, '<em>$1</em>');
+                text = text.replace(patterns.strikethrough, '<del>$1</del>');
+                text = text.replace(patterns.links, '<a href="$2" style="color: #ffa500;">$1</a>');
+                text = text.replace(patterns.unorderedList, '<li>$1</li>');
+                text = text.replace(patterns.orderedList, '<li>$1</li>');
+                text = text.replace(patterns.code, '<code>$1</code>');
+                return text;
+            }
 
-    document.getElementById("send-button").addEventListener("click", function () {
-      const messageInput = document.getElementById("message-input");
-      const message = messageInput.value.trim();
+            const lines = response.split('\n');
+            let formattedResponse = '';
 
-      if (message !== "") {
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("message");
-        messageDiv.textContent = message;
-        conversationDiv.appendChild(messageDiv);
-        conversationDiv.scrollTop = conversationDiv.scrollHeight;
+            for (const line of lines) {
+                formattedResponse += `<p>${replaceMarkdown(line)}</p>`;
+            }
 
-        webSocket.send(message);
-        messageInput.value = "";
-        sendButtonText.style.display = "none";
-        loadingIndicator.style.display = "inline-block";
-      }
-    });
-
-    document.getElementById("message-input").addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        document.getElementById("send-button").click();
-      }
-    });
-
-    // Listen for beforeunload event to close WebSocket connection before page unload
-    window.addEventListener("beforeunload", function() {
-      webSocket.close();
-    });
-
-    function sendSuggestion(suggestion) {
-      const messageDiv = document.createElement("div");
-      messageDiv.classList.add("message");
-      messageDiv.textContent = suggestion;
-      conversationDiv.appendChild(messageDiv);
-      conversationDiv.scrollTop = conversationDiv.scrollHeight;
-
-      webSocket.send(suggestion);
-      sendButtonText.style.display = "none";
-      loadingIndicator.style.display = "inline-block";
-    }
-
-    function formatResponse(response) {
-      // Regular expression patterns for different Markdown elements
-      const patterns = {
-        headings: /^#+\s(.+)/,
-        bold: /\*\*(.*?)\*\*/g,
-        italic: /_(.*?)_/g,
-        strikethrough: /~~(.*?)~~/g,
-        links: /\[([^\]]+)\]\(([^)]+)\)/g,
-        unorderedList: /^\s*-\s(.+)/,
-        orderedList: /^\s*\d+\.\s(.+)/,
-        code: /`([^`]+)`/g,
-      };
-
-      // Function to replace Markdown patterns with HTML tags
-      function replaceMarkdown(text) {
-        // Replace headings
-        text = text.replace(patterns.headings, '<h3 style="color: #ffa500;">$1</h3>');
-        // Replace bold
-        text = text.replace(patterns.bold, '<strong>$1</strong>');
-        // Replace italic
-        text = text.replace(patterns.italic, '<em>$1</em>');
-        // Replace strikethrough
-        text = text.replace(patterns.strikethrough, '<del>$1</del>');
-        // Replace links
-        text = text.replace(patterns.links, '<a href="$2" style="color: #ffa500;">$1</a>');
-        // Replace unordered list items
-        text = text.replace(patterns.unorderedList, '<li>$1</li>');
-        // Replace ordered list items
-        text = text.replace(patterns.orderedList, '<li>$1</li>');
-        // Replace code blocks
-        text = text.replace(patterns.code, '<code>$1</code>');
-        return text;
-      }
-
-      // Split response into lines and apply Markdown formatting
-      const lines = response.split('\n');
-      let formattedResponse = '';
-
-      for (const line of lines) {
-        formattedResponse += `<p>${replaceMarkdown(line)}</p>`;
-      }
-
-      return formattedResponse;
-    }
-</script>
-
+            return formattedResponse;
+        }
+    </script>
 </body>
 </html>

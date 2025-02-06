@@ -9,13 +9,13 @@ from llama_index.core.evaluation import (BatchEvalRunner,
                                          generate_question_context_pairs)
 
 from query_engines.ocpp_query_engine import (OpenAI, ServiceContext, VectorStoreIndex,
-                         hybrid_retriever, llm, nodes, query_engine)
+                         vector_retriever, ocpp_query, nodes, ocpp_query_engine)
 
 # create question context pairs
 question_context_pairs = generate_question_context_pairs(
     nodes=nodes,
     num_questions_per_chunk=2,
-    llm=llm,
+    llm=ocpp_query.llm
 )
 
 # # save it as a json file
@@ -26,7 +26,7 @@ question_context_pairs = generate_question_context_pairs(
 # "question_context_pairs.json")
 # retriever = vector_store.as_retriever(similarity_top_k=4)
 retriever_evaluator = RetrieverEvaluator.from_metric_names(
-    ["mrr", "hit_rate"], retriever=hybrid_retriever
+    ["mrr", "hit_rate"], retriever=vector_retriever
 )
 
 
@@ -50,9 +50,12 @@ def display_results_retriever(name, eval_results):
 
 # create a retriever evaluator
 async def run_retriever_evaluator():
-    eval_results = await retriever_evaluator.aevaluate_dataset(
+    eval_results = await retriever_evaluator.evaluate_dataset(
         question_context_pairs)
-    print(display_results_retriever("Retriever", eval_results))
+    results_str = display_results_retriever("Retriever", eval_results)
+    print(results_str)
+    with open("retriever_eval_results.txt", "w") as f:
+        f.write(results_str)
 
 # run the retriever evaluator
 asyncio.run(run_retriever_evaluator())
@@ -63,15 +66,15 @@ asyncio.run(run_retriever_evaluator())
 queries = list(question_context_pairs.queries.values())
 
 # create gpt-3.5-turbo model
-gpt_3_5_turbo = OpenAI(model="gpt-3.5-turbo", temperature=0)
+gpt_3_5_turbo = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
 service_context_gpt_3_5_turbo = ServiceContext.from_defaults(llm=gpt_3_5_turbo)
 
 
 # create a faithfulness evaluator using gpt4
-faithfulness_gpt4 = FaithfulnessEvaluator(llm=llm)
+faithfulness_gpt4 = FaithfulnessEvaluator(llm=ocpp_query.llm)
 
 # create a relevancy evaluator using gpt4
-relevancy_gpt4 = RelevancyEvaluator(llm=llm)
+relevancy_gpt4 = RelevancyEvaluator(llm=ocpp_query.llm)
 
 # batch eval runner
 batch_eval_runner = queries
@@ -85,16 +88,20 @@ runner = BatchEvalRunner(
 # Compute evaluation
 async def run_response_evaluator():
     eval_results = await runner.aevaluate_queries(
-        query_engine, queries=batch_eval_runner
+        ocpp_query_engine, queries=batch_eval_runner
     )
     # lets get faithfulness and relevancy scores
     faithfulness_score = sum(result.passing for result in eval_results[
         'faithfulness']) / len(eval_results['faithfulness'])
     print(f"Faithfulness Score: {faithfulness_score}")
+    with open("faithfulness_eval_results.txt", "w") as f:
+        f.write(str(faithfulness_score))
 
     relevancy_score = sum(result.passing for result in eval_results[
         'relevancy']) / len(eval_results['relevancy'])
     print(f"Relevancy Score: {relevancy_score}")
+    with open("relevancy_eval_results.txt", "w") as f:
+        f.write(str(relevancy_score))
 
 # run the response evaluator
 asyncio.run(run_response_evaluator())

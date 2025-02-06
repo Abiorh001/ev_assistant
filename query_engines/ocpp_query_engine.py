@@ -6,7 +6,7 @@ from typing import Tuple, Union
 from dotenv import load_dotenv
 from llama_index.core import (ServiceContext, Settings, SimpleDirectoryReader,
                               StorageContext, VectorStoreIndex,
-                              load_index_from_storage)
+                              load_index_from_storage, get_response_synthesizer)
 from llama_index.core.node_parser import SentenceSplitter, SimpleNodeParser
 from llama_index.core.postprocessor import SimilarityPostprocessor
 from llama_index.core.query_engine import RetrieverQueryEngine
@@ -26,7 +26,7 @@ logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 # Load environment variables
 load_dotenv()
 
-
+Settings.llm = OpenAI(temperature=0.2, model="gpt-4-1106-preview")
 class OCPPQueryEngine:
     def __init__(self):
         self.openai_api_key: Union[str, None] = os.getenv("OPENAI_API_KEY")
@@ -34,7 +34,7 @@ class OCPPQueryEngine:
         self.cohere_api_key: Union[str, None] = os.environ.get("COHERE_API_KEY")
         self.pinecone_api_key: Union[str, None] = os.environ.get("PINECONE_API_KEY")
         # self.LOCAL_STORAGE_PATH: str = "vector_storage"
-        self.llm: OpenAI = OpenAI(model="gpt-4-1106-preview", max_tokens=1000)
+        # self.llm: OpenAI = OpenAI(model="gpt-4-1106-preview", max_tokens=1000)
         self.embed_model: OpenAIEmbedding = OpenAIEmbedding(
             model="text-embedding-ada-002"
         )
@@ -146,9 +146,22 @@ ocpp_query = OCPPQueryEngine()
 # hybrid_retriever = HybridRetriever(vector_index_retriever, bm25_retriever)
 vector_index = ocpp_query.create_pinecone_index()
 vector_retriever = VectorIndexRetriever(index=vector_index, similarity_top_k=8)
+# documents = SimpleDirectoryReader(
+#                 "data", recursive=True, file_extractor=None
+#             ).load_data()
+# splitter = SentenceSplitter(chunk_size=512, chunk_overlap=20)
+# nodes = splitter.get_nodes_from_documents(documents)
+# vector_retriever = VectorStoreIndex(
+#                 nodes=nodes, embed_model=ocpp_query.embed_model, show_progress=True
+#             )
 cohere_rerank = CohereRerank(api_key=ocpp_query.cohere_api_key, top_n=8)
-ocpp_query_engine = RetrieverQueryEngine.from_args(
+# configure response synthesizer
+response_synthesizer = get_response_synthesizer()
+ocpp_query_engine = RetrieverQueryEngine(
     retriever=vector_retriever,
-    node_postprocessors=[cohere_rerank],
-    llm=ocpp_query.llm,
+    response_synthesizer=response_synthesizer,
+    node_postprocessors=[cohere_rerank]
 )
+
+# response =  ocpp_query_engine.query("in the document explain to me the oca whitepapers")
+# print(response)
